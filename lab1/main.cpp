@@ -1,5 +1,5 @@
 #include <iostream> 
-#include <vector>
+#include <fstream>
 using namespace std;
 
 struct Truba 
@@ -63,21 +63,99 @@ void Print_KC(KC kc)
 		<< "\tEnter effect: " << kc.effect << endl;
 };
 
+int Vvod_vibor()
+{
+	cout << "Select: ";
+	int vibor = 0;
+	cin >> vibor;
+	while (cin.fail())
+	{
+		cin.clear();
+		cin.ignore(1000, '\n');
+		cout << "Try again \n";
+		cin >> vibor;
+	}
+	return vibor;
+}
+
 int main()
 {
-	Truba tr = vvod_truba();
+	cout << "Select menu item:" 
+		<<"\n1. Add pipe"
+		<<"\n2. Add KS"
+		<<"\n3. View all objects"
+		<<"\n4. Edit pipe"
+		<<"\n5. Edit KS"
+		<<"\n6. Save"
+		<<"\n7. Dowload"
+		<<"\n8. Exit" << endl;
+
+
+	switch (Vvod_vibor())
+	{
+	case 1:
+	{
+		cout << "1. Add pipe"<< endl;
+		Truba tr = vvod_truba();
+		main();
+		break;
+	}
+	case 2:
+	{
+		cout << "2. Add KS" << endl;
+		KC kc = vvod_KC();
+		main();
+		break;
+	}
+	case 3:
+	{
+		cout << "3. View all objects" << endl;
+		main();
+		break;
+	}
+	case 4:
+	{
+		cout << "4. Edit pipe" << endl;
+		main();
+		break;
+	}
+	case 5:
+	{
+		cout << "5. Edit KS" << endl;
+		main();
+		break;
+	}
+	case 6:
+	{
+		cout << "6. Save" << endl;
+		main();
+		break;
+	}
+	case 7:
+	{
+		cout << "7. Dowload" << endl;
+		main();
+		break;
+	}
+	case 8:
+	{
+		cout << "8. Exit" << endl;
+		break;
+	}
+	default:
+	{
+		cout << "Entry a number from  1 to 8 "<<endl;
+		switch (Vvod_vibor());
+		break;
+	}
+	}
+	/*Truba tr = vvod_truba();
 	Print_truba(tr);
-	/*vector <Truba> truboprovod;
-	size_t n = 0;
-	cin >> n;
-	truboprovod.resize(n);*/
+	
 
 	KC kc = vvod_KC();
-	Print_KC(kc);
-	/*vector <KC> KCgroup;
-	size_t m = 0;
-	cin >> m;
-	KCgroup.resize(m);*/
+	Print_KC(kc);*/
+	
 
 	return 0;
 }
