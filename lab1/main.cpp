@@ -127,7 +127,7 @@ CS enter_CS()
 	return cs;
 };
 
-void Print_truba(Truba tr)
+void Print_truba(const Truba& tr)
 {
 	if ((tr.name_truba) != "None") {
 		cout << "Pipe:" << endl;
@@ -140,7 +140,7 @@ void Print_truba(Truba tr)
 		cout<< "You do not have pipe" << endl;
 };
 
-void Print_CS(CS cs)
+void Print_CS(const CS& cs)
 {
 	if ((cs.name_cs) != "None") {
 		cout << "Station:" << endl;
@@ -195,7 +195,7 @@ void Read_from_file(Truba& pipe, CS& station)
 				cout << "Data received from file about pipe:" << endl;
 				cout << "\nPipe" << endl;
 				getline(fin, pipe.name_truba);
-				cout << "Pipe elevation: " << pipe.name_truba << endl;
+				cout << "Pipe name: " << pipe.name_truba << endl;
 				fin >> pipe.lenght;
 				cout << "Pipe length: " << pipe.lenght << endl;
 				fin >> pipe.diametr;
