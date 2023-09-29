@@ -35,7 +35,7 @@ int Enter_vibor()
 	return vibor;
 }
 
-double proverka_doub(double& doub)
+void proverka_doub(double& doub)
 {
 	cin >> doub;
 	while (cin.fail() || cin.peek() != '\n' || doub <= 0)
@@ -46,10 +46,9 @@ double proverka_doub(double& doub)
 		cout << "Enter double ";
 		cin >> doub;
 	}
-	return doub;
 }
 
-int proverka_int(int& inter)
+void proverka_int(int& inter)
 {
 	cin >> inter;
 	while (cin.fail() || cin.peek() != '\n' || inter <= 0)
@@ -60,25 +59,22 @@ int proverka_int(int& inter)
 		cout << "Enter integer ";
 		cin >> inter;
 	}
-	return inter;
 }
 
-bool proverka_bool(bool& bolli)
+void proverka_bool(bool& boolli)
 {
-	cin >> bolli;
+	cin >> boolli;
 	while (cin.fail() || cin.peek() != '\n')
 	{
 		cin.clear();
 		cin.ignore(1000, '\n');
 		cout << "Try again \n";
 		cout << "Enter bool ";
-		cin >> bolli;
+		cin >> boolli;
 	}
-	return bolli;
-
 }
 
-char proverka_char(char& chari)
+void proverka_char(char& chari)
 {
 	cin >> chari;
 	while (cin.fail() || cin.peek() != '\n' || chari < 'A' || chari>'D')
@@ -88,7 +84,6 @@ char proverka_char(char& chari)
 		cout << "Enter a value from A to D \n";
 		cin >> chari;
 	}
-	return chari;
 }
 
 Truba enter_truba()
@@ -192,7 +187,7 @@ void Read_from_file(Truba& pipe, CS& station)
 		{
 			if (name_of_cs_or_truba == "Pipe")
 			{
-				cout << "Data received from file about pipe:" << endl;
+				cout << "Information about pipe:" << endl;
 				cout << "\nPipe" << endl;
 				getline(fin, pipe.name_truba);
 				cout << "Pipe name: " << pipe.name_truba << endl;
@@ -204,9 +199,9 @@ void Read_from_file(Truba& pipe, CS& station)
 				cout << "The pipe attribute: " << pipe.repair << endl;
 				p += 1;
 			}
-			if (name_of_cs_or_truba == "Compressor station")
+			if (name_of_cs_or_truba == "Station")
 			{
-				cout << "Data received from file about Cs:" << endl;
+				cout << "Information about Cs:" << endl;
 				cout << "\nCompressor station" << endl;
 				getline(fin, station.name_cs);
 				cout << "Cs name: " << station.name_cs << endl;
