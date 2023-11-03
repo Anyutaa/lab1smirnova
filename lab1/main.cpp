@@ -1,236 +1,171 @@
 #include <iostream> 
 #include <fstream>
 #include <string>
+#include <unordered_map>
+#include "Truba.h"
+#include "CS.h"
+#include "utils.h"
+
 using namespace std;
 
-struct Truba
-{
-	string name_truba = "None";
-	double lenght = 0;
-	int diametr = 0;
-	bool repair = false;
-};
+//struct Truba
+//{
+//	string name_truba = "None";
+//	double lenght = 0;
+//	int diametr = 0;   
+//	bool repair = false;
+//};
 
-struct CS
-{
-	string name_cs = "None";
-	int workshops = 0;
-	int workshops_work = 0;
-	char effect = 'A';
-};
+//struct CS
+//{
+//	string name_cs = "None";
+//	int workshops = 0;
+//	int workshops_work = 0;
+//	char effect = 'A';
+//};
 
-int Enter_vibor()
+void OutputPipe(unordered_map <int, Truba>& p)
 {
-	cout << "\nSelect: ";
-	int vibor = -1;
-	cin >> vibor;
-	while (cin.fail() || cin.peek() != '\n')
+	if ((p.size()) == 0)
 	{
-		cin.clear();
-		cin.ignore(1000, '\n');
-		cout << "Try again \n";
-		cout << "Select: ";
-		cin >> vibor;
-	}
-	return vibor;
-}
-
-void proverka_doub(double& doub)
-{
-	cin >> doub;
-	while (cin.fail() || cin.peek() != '\n' || doub <= 0)
-	{
-		cin.clear();
-		cin.ignore(1000, '\n');
-		cout << "Try again \n";
-		cout << "Enter double ";
-		cin >> doub;
-	}
-}
-
-void proverka_int(int& inter)
-{
-	cin >> inter;
-	while (cin.fail() || cin.peek() != '\n' || inter <= 0)
-	{
-		cin.clear();
-		cin.ignore(1000, '\n');
-		cout << "Try again \n";
-		cout << "Enter integer ";
-		cin >> inter;
-	}
-}
-
-void proverka_bool(bool& boolli)
-{
-	cin >> boolli;
-	while (cin.fail() || cin.peek() != '\n')
-	{
-		cin.clear();
-		cin.ignore(1000, '\n');
-		cout << "Try again \n";
-		cout << "Enter bool ";
-		cin >> boolli;
-	}
-}
-
-void proverka_char(char& chari)
-{
-	cin >> chari;
-	while (cin.fail() || cin.peek() != '\n' || chari < 'A' || chari>'D')
-	{
-		cin.clear();
-		cin.ignore(1000, '\n');
-		cout << "Enter a value from A to D \n";
-		cin >> chari;
-	}
-}
-
-Truba enter_truba()
-{
-	Truba tr;
-	cout << "Enter name truba:";
-	cin.ignore();
-	getline(cin, tr.name_truba);
-	cout << "Enter lenght:";
-	proverka_doub(tr.lenght);
-	cout << "Enter diametr:";
-	proverka_int(tr.diametr);
-	cout << "Enter repair:";
-	proverka_bool(tr.repair);
-	return tr;
-
-};
-
-CS enter_CS()
-{
-	CS cs;
-	cout << "Enter name CS:";
-	cin.ignore();
-	getline(cin, cs.name_cs);
-	cout << "Enter workshops:";
-	proverka_int(cs.workshops);
-	cout << "Enter workshops in work:";
-	proverka_int(cs.workshops_work);
-	while (cs.workshops < cs.workshops_work)
-	{
-		cout << "Enter a smaller value" << endl;
-		proverka_int(cs.workshops_work);
-	}
-	cout << "Enter effect:";
-	proverka_char(cs.effect);
-	return cs;
-};
-
-void Print_truba(const Truba& tr)
-{
-	if ((tr.name_truba) != "None") {
-		cout << "Pipe:" << endl;
-		cout << "Enter name truba:" << tr.name_truba
-			<< "\nEnter lenght:" << tr.lenght
-			<< "\nEnter diametr:" << tr.diametr
-			<< "\nEnter repair : " << tr.repair << endl;
-	}
-	else
 		cout << "You do not have pipe" << endl;
-};
-
-void Print_CS(const CS& cs)
-{
-	if ((cs.name_cs) != "None") {
-		cout << "Station:" << endl;
-		cout << "Enter name Cs:" << cs.name_cs
-			<< "\nEnter workshops:" << cs.workshops
-			<< "\nEnter workshops in work:" << cs.workshops_work
-			<< "\nEnter effect: " << cs.effect << endl;
 	}
 	else
+		for (auto x : p)
+			cout << x.first << " " <<
+			x.second << endl;
+}
+void OutputCs( unordered_map <int, CS>& s)
+{
+	if ((s.size()) == 0)
+	{
 		cout << "You do not have compressor station" << endl;
-};
+	}
+	else
+		for (auto x : s)
+			cout << x.first << " " <<
+			x.second << endl;
+	
+}
 
-void Writing_to_file(Truba& pipe, CS& station)
+//Truba& SelectTruba(unordered_map <int, Truba>& p)
+//{
+//		cout << "Enter index for pipe: ";
+//		unsigned int index = GetCorrect(0u, unsigned int(p.size() - 1));
+//		return p[index];
+//}
+//
+//CS& SelectCS(unordered_map <int, CS>& s)
+//{
+//		cout << "Enter index for station: ";
+//		unsigned int index = GetCorrect(0u, unsigned int(s.size() - 1));
+//		return s[index];
+//}
+
+
+void Writing_to_file_pipe(unordered_map <int, Truba>& p)
 {
 	ofstream fout("lab_smirnova.txt");
-	if ((pipe.name_truba) != "None") {
-		cout << "Add information about pipe " << endl;
-		fout << "Pipe" << endl;
-		fout << pipe.name_truba << endl;
-		fout << pipe.lenght << endl;
-		fout << pipe.diametr << endl;
-		fout << pipe.repair << endl;
-	}
-	else
+	if ((p.size()) == 0)
+	{
 		cout << "No information about pipe " << endl;
-
-	if ((station.name_cs) != "None") {
-		cout << "Add information about station " << endl;
-		fout << "Station" << endl;
-		fout << station.name_cs << endl;
-		fout << station.workshops << endl;
-		fout << station.workshops_work << endl;
-		fout << station.effect << endl;
+		return;
 	}
-	else
+	cout << "Add information about pipe " << endl;
+	fout << "Pipes" << endl;
+	for (auto x : p)
+		fout << "Pipe: \n" << x.first << " " << x.second << endl;
+
+	fout.close(); 
+}
+
+void Writing_to_file_cs( unordered_map <int, CS>& s)
+{
+	ofstream fout("lab_smirnova.txt",ios::app);
+	if ((s.size()) == 0)
+	{
 		cout << "No information about station " << endl;
+		return;
+	}
+	cout << "Add information about station " << endl;
+	fout << "Stations" << endl;
+	for (auto x : s)
+		fout << "Station: \n" << x.first << " " << x.second << endl;
 	fout.close();
 }
 
-void Read_from_file(Truba& pipe, CS& station)
+void Read_from_file_pipe(unordered_map <int, Truba>& p)
 {
 	ifstream fin("lab_smirnova.txt");
 	if (fin)
 	{
-		string name_of_cs_or_truba = "no";
-		int p = 0;
-		int s = 0;
-		while (getline(fin, name_of_cs_or_truba))
+		string name_of_truba = "none";
+		bool kp = 0;
+		while (getline(fin, name_of_truba))
 		{
-			if (name_of_cs_or_truba == "Pipe")
+			if (name_of_truba == "Pipe: ")
 			{
-				cout << "Information about pipe:" << endl;
-				cout << "\nPipe" << endl;
+				Truba pipe;
+				int m = 0;
+				fin >> m;
+				fin >> pipe.MaxIDTruba;
+				fin >> pipe.idpipe;
 				getline(fin, pipe.name_truba);
-				cout << "Pipe name: " << pipe.name_truba << endl;
 				fin >> pipe.lenght;
-				cout << "Pipe length: " << pipe.lenght << endl;
 				fin >> pipe.diametr;
-				cout << "Pipe diameter: " << pipe.diametr << endl;
 				fin >> pipe.repair;
-				cout << "The pipe attribute: " << pipe.repair << endl;
-				p += 1;
-			}
-			if (name_of_cs_or_truba == "Station")
-			{
-				cout << "Information about Cs:" << endl;
-				cout << "\nCompressor station" << endl;
-				getline(fin, station.name_cs);
-				cout << "Cs name: " << station.name_cs << endl;
-				fin >> station.workshops;
-				cout << "Number of workshops of the Cs: " << station.workshops << endl;
-				fin >> station.workshops_work;
-				cout << "Number of workshops in operation of the Cs: " << station.workshops_work << endl;
-				fin >> station.effect;
-				cout << "CS efficiency: " << station.effect << endl;
-				s += 1;
+				p.insert({ m,pipe});
+				kp =true;
 			}
 		}
-
-		if (p == 0)
+		if (!kp)
 		{
 			cout << "No information about pipe." << endl;
 		}
-		if (s == 0)
+		else
+			return OutputPipe(p);
+	}
+	fin.close();
+}
+
+void Read_from_file_cs( unordered_map <int, CS>& s)
+{
+	ifstream fin("lab_smirnova.txt");
+	if (fin)
+	{
+		string name_of_cs = "none";
+		bool ks = 0;
+		while (getline(fin, name_of_cs))
+		{
+			if (name_of_cs == "Station: ")
+			{
+				CS cs;
+				int m = 0;
+				fin >> m;
+				fin >> cs.MaxIDCS;
+				fin >> cs.idcs;
+				getline(fin, cs.name_cs);
+				fin >> cs.workshops;
+				fin >> cs.workshops_work;
+				fin >> cs.effect;
+				s.insert({m,cs});
+				ks = true;
+			}
+		}
+		if (!ks)
 		{
 			cout << "No information about station." << endl;
 		}
+		else
+			return OutputCs(s);
 	}
 	fin.close();
 }
 
 int main()
 {
-	Truba pipe;
-	CS station;
+	unordered_map < int, Truba > pipes;
+	unordered_map < int, CS > stations;
 	while (true)
 	{
 		cout << "\nSelect menu item:"
@@ -241,42 +176,49 @@ int main()
 			<< "\n5. Edit KS"
 			<< "\n6. Save"
 			<< "\n7. Dowload"
-			<< "\n8. Exit" << endl;
-		switch (Enter_vibor())
+			<< "\n8. Exit" 
+			<< "\nChoose action ";
+		int vibor = -1;
+		vibor = GetCorrect(1,8);
+		switch (vibor)
 		{
 		case 1:
 		{
-			if ((pipe.name_truba) == "None") {
-				cout << "1. Add pipe" << endl;
-				pipe = enter_truba();
-			}
-			else
-				cout << "You have already entered the pipe" << endl;
+			Truba pipe;
+			cout << "1. Add pipe" << endl;
+			cin >> pipe;
+			pipes.insert({ pipe.get_idp(),pipe});
 			break;
 		}
 		case 2:
 		{
-			if ((station.name_cs) == "None") {
-				cout << "2. Add Cs" << endl;
-				station = enter_CS();
-			}
-			else
-				cout << "You have already entered the station" << endl;
+			CS station;
+			cout << "2. Add Cs" << endl;
+			cin >> station;
+			stations.insert({ station.get_idc(),station});
 			break;
 		}
 		case 3:
 		{
 			cout << "3. View all objects" << endl;
-			Print_truba(pipe);
-			Print_CS(station);
+			OutputPipe(pipes);
+			OutputCs( stations);
 			break;
 		}
 		case 4:
 		{
-			if ((pipe.name_truba) != "None") {
+			if ((pipes.size()) != 0) {
 				cout << "4. Edit pipe" << endl;
+				int mid = (pipes.size()) - 1;
+				int id = 0;
+				cout << "Enter id pipe: ";
+				id = GetCorrect(0,mid);
+				Truba pipe;
 				cout << "Entry the pipe state ";
-				proverka_bool(pipe.repair);
+				pipe = pipes[id];
+				pipe.repair= GetCorrect(0, 1);
+				pipes.erase(id);
+				pipes.insert({ id,pipe});
 			}
 			else
 				cout << " You do not have a pipe" << endl;
@@ -284,15 +226,19 @@ int main()
 		}
 		case 5:
 		{
-			if ((station.name_cs) != "None") {
+			if ((stations.size()) != 0) {
 				cout << "5. Edit Cs" << endl;
+				int mid = (pipes.size()) - 1;
+				int id = 0;
+				cout << "Enter id station: " ;
+				id = GetCorrect(0, mid);
+				CS cs;
 				cout << "Entry the number of workshops ";
-				proverka_int(station.workshops_work);
-				while (station.workshops < station.workshops_work)
-				{
-					cout << "Enter a smaller value " << endl;
-					proverka_int(station.workshops_work);
-				}
+				cs = stations[id];
+				cs.workshops_work = GetCorrect(0, cs.workshops);
+				stations.erase(id);
+				stations.insert({ id,cs});
+				
 			}
 			else
 				cout << " You do not have a compressor station " << endl;
@@ -301,13 +247,15 @@ int main()
 		case 6:
 		{
 			cout << "6. Save" << endl;
-			Writing_to_file(pipe, station);
+			Writing_to_file_pipe(pipes);
+			Writing_to_file_cs(stations);
 			break;
 		}
 		case 7:
 		{
-			cout << "7. Dowload" << endl;
-			Read_from_file(pipe, station);
+			cout << "7. Download" << endl;
+			Read_from_file_pipe(pipes);
+			Read_from_file_cs( stations);
 			break;
 		}
 		case 8:

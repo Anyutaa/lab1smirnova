@@ -1,0 +1,10 @@
+Pipes
+Pipe: 
+0 
+MaxID: 2
+ID: 0
+Pipe name: 45276372
+Pipe length: 23
+Pipe diameter: 12
+The pipe attribute: 0
+
