@@ -1,10 +1,27 @@
 Pipes
-Pipe: 
 0 
 MaxID: 2
 ID: 0
-Pipe name: 45276372
-Pipe length: 23
-Pipe diameter: 12
+Pipe name: 1000000000
+Pipe length: 456
+Pipe diameter: 44
+The pipe attribute: 1
+
+1 
+MaxID: 2
+ID: 1
+Pipe name: dfgh
+Pipe length: 34
+Pipe diameter: 22
 The pipe attribute: 0
+
+Stations
+Station: 
+0 
+MaxID: 1
+ID: 0
+Cs name:00000000000
+Number of workshops of the Cs:345
+Number of workshops in operation of the Cs:6
+CS efficiency: A
 

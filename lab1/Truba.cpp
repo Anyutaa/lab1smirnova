@@ -11,6 +11,25 @@ Truba::Truba()
 	idpipe = MaxIDTruba++;
 }
 
+void Add_pipe(unordered_map < int, Truba >& pipes) {
+	Truba pipe;
+	cout << "1. Add pipe" << endl;
+	cin >> pipe;
+	pipes.insert({ pipe.get_idp(),pipe });
+}
+
+void OutputPipe(unordered_map <int, Truba>& p)
+{
+	if ((p.size()) == 0)
+	{
+		cout << "You do not have pipe" << endl;
+	}
+	else
+		for (auto x : p)
+			cout << x.first << " " <<
+			x.second << endl;
+}
+
 istream& operator >> (istream& in, Truba& tr)
 {
 	cout << "Enter name truba:";
@@ -25,7 +44,7 @@ istream& operator >> (istream& in, Truba& tr)
 	return in;
 }
 
-ostream& operator << (ostream& out, Truba& tr)
+ostream& operator << (ostream& out, const Truba& tr)
 {
 	if ((tr.name_truba) == "None")
 	{
@@ -43,19 +62,52 @@ ostream& operator << (ostream& out, Truba& tr)
 	return out;
 }
 
-//void Writing_to_file_pipe(unordered_map <int, Truba>& p)
-//{
-//	ofstream fout("lab_smirnova.txt");
-//	if ((p.size()) == 0)
-//	{
-//		cout << "No information about pipe " << endl;
-//		return;
-//	}
-//	cout << "Add information about pipe " << endl;
-//	fout << "Pipes" << endl;
-//	for (auto x : p)
-//		fout << x.first << " " << x.second << endl;
-//
-//	fout.close();
-//}
+void Writing_to_file_pipe(unordered_map <int, Truba>& p)
+{
+	ofstream fout("lab_smirnova.txt");
+	if ((p.size()) == 0)
+	{
+		cout << "No information about pipe " << endl;
+		return;
+	}
+	cout << "Add information about pipe " << endl;
+	fout << "Pipes" << endl;
+	for (auto x : p)
+		fout << x.first << " " << x.second << endl;
 
+	fout.close();
+}
+
+void Read_from_file_pipe(unordered_map <int, Truba>& p)
+{
+	ifstream fin("lab_smirnova.txt");
+	if (fin)
+	{
+		string name_of_truba = "none";
+		bool kp = 0;
+		while (getline(fin, name_of_truba))
+		{
+			if (name_of_truba == "Pipe: ")
+			{
+				Truba pipe;
+				int m = 0;
+				fin >> m;
+				fin >> pipe.MaxIDTruba;
+				fin >> pipe.idpipe;
+				getline(fin, pipe.name_truba);
+				fin >> pipe.lenght;
+				fin >> pipe.diametr;
+				fin >> pipe.repair;
+				p.insert({ m,pipe });
+				kp = true;
+			}
+		}
+		if (!kp)
+		{
+			cout << "No information about pipe." << endl;
+		}
+		else
+			return OutputPipe(p);
+	}
+	fin.close();
+}
