@@ -5,11 +5,61 @@
 #include "Truba.h"
 #include "CS.h"
 #include "utils.h"
+#include <chrono>
+#include <format>
+
 using namespace std;
+using namespace chrono;
+
+void Writing_to_file_pipe_cs(unordered_map <int, Truba>& p, unordered_map <int, CS>& s)
+{
+	if ((p.size()) == 0 && (s.size()) == 0)
+	{
+		cout << "No information about pipe and cs " << endl;
+		return;
+	}
+	else {
+		string filename;
+		cin >> filename;
+		ofstream fout;
+		fout.open((filename + ".txt"), ios::trunc);
+
+		if (fout.is_open())
+		{
+			
+			if ((p.size()) == 0)
+			{
+				cout << "You do not have pipe" << endl;
+			}
+			else {
+				for (const auto& x : p)
+					DataRecordingPipe(fout, x.second);
+				cout << "Add information about pipe " << endl;
+			}
+			if ((s.size()) == 0)
+			{
+				cout << "You do not have compressor station" << endl;
+			}
+			else {
+				for (const auto& x : s)
+					DataRecordingCS(fout, x.second);
+				cout << "Add information about station " << endl;
+			}
+
+			fout.close();
+		}
+	}
+}
 
 
 int main()
 {
+	redirect_output_wrapper cerr_out(cerr);
+	string time = format("{:%d_%m_%Y %H_%M_%OS}", system_clock::now());
+	ofstream logfile("log_" + time);
+	if (logfile)
+		cerr_out.redirect(logfile);
+
 	unordered_map < int, Truba > pipes;
 	unordered_map < int, CS > stations;
 	while (true)
@@ -18,11 +68,11 @@ int main()
 			<< "\n1. Add pipe"
 			<< "\n2. Add CS"
 			<< "\n3. View all objects"
-			<< "\n4. Edit pipe"
-			<< "\n5. Edit KS"
+			<< "\n4. Filter for pipes"
+			<< "\n5. Filter for cs"
 			<< "\n6. Save"
 			<< "\n7. Dowload"
-			<< "\n8. Exit" 
+			<< "\n8. Exit"
 			<< "\nChoose action ";
 		int vibor = -1;
 		vibor = GetCorrect(1,8);
@@ -45,73 +95,22 @@ int main()
 			OutputCs(stations);
 			break;
 		}
-		/*case 4:
+		case 4:
 		{
-			if ((pipes.size()) != 0) {
-				cout << "Enter number of pipes to edit: ";
-				int number_of_pipes = 0;
-				cin >> number_of_pipes;
-				int i;
-				int mid = (pipes.size()) - 1;
-				for (i = 1; i <= number_of_pipes; i++)
-				{
-					int id = 0;
-					cout << "Enter id pipe: ";
-					id = GetCorrect(0, mid);
-					cout << "Entry the pipe state ";
-					Truba& pipe = pipes[id];
-					pipe.repair = GetCorrect(0, 1);
-					
-				}
-			}
-			else
-				cout << " You do not have a pipe" << endl;
+			cout << "4. Filter for pipes" << endl;
+			Filter_pipe(pipes);
 			break;
 		}
 		case 5:
 		{
-
-			if ((stations.size()) != 0) {
-				cout << "Enter number of cs to edit: ";
-				int number_of_cs = 0;
-				cin >> number_of_cs;
-				int i;
-				int mid = (stations.size()) - 1;
-				for (i = 1; i <= number_of_cs; i++)
-				{
-					int id = 0;
-					cout << "Enter id station: ";
-					id = GetCorrect(0, mid);
-					cout << "Entry the number of workshops ";
-					CS& cs = stations[id];
-					cs.workshops_work = GetCorrect(0, cs.workshops);
-			
-				}
-			}
-			else
-				cout << " You do not have a compressor station" << endl;
-			break;*/
-
-			/*if ((stations.size()) != 0) {
-				cout << "5. Edit Cs" << endl;
-				int mid = (pipes.size()) - 1;
-				int id = 0;
-				cout << "Enter id station: " ;
-				id = GetCorrect(0, mid);
-				cout << "Entry the number of workshops ";
-				CS& cs = stations[id];
-				cs.workshops_work = GetCorrect(0, cs.workshops);
-				
-			}
-			else
-				cout << " You do not have a compressor station " << endl;
-			break;*/
-		/*}*/
+			cout << "5. Filter for cs" << endl;
+			Filter_cs(stations);
+			break;
+		}
 		case 6:
 		{
 			cout << "6. Save" << endl;
-			Writing_to_file_pipe(pipes);
-			Writing_to_file_cs(stations);
+			Writing_to_file_pipe_cs(pipes,stations);
 			break;
 		}
 		case 7:
@@ -125,11 +124,6 @@ int main()
 		{
 			cout << "8. Exit" << endl;
 			return false;
-		}
-		default:
-		{
-			cout << "Entry a number from  1 to 8 " << endl;
-			break;
 		}
 		}
 	}
