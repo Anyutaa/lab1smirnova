@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include "utils.h"
+#include <set>
 using namespace std;
 
 int Truba::MaxIDTruba = 0;
@@ -32,58 +33,116 @@ void OutputPipe(unordered_map <int, Truba>& p)
 			x.second << endl;
 }
 
-void Edit_pipe(unordered_map <int, Truba>& p, vector <int>& id_filter){
-		if ((id_filter.size()) != 0) {
-				cout << "Enter number of pipes to edit.  You have"+to_string(id_filter.size())+" pipes.";
-				int number_of_pipes = GetCorrect(0, int(id_filter.size()));
-				for (int i = 1; i <= number_of_pipes; i++)
-				{
-					cout << "Enter id pipe: ";
-					int id = GetCorrect(0, int(*max_element(id_filter.begin(), id_filter.end())));
-					if (find(id_filter.begin(), id_filter.end(), id) != id_filter.end()) {
-						Truba& pipe = p[id];
-						pipe.repair = !pipe.repair;
-					}
-				}
-			}
-			else
-				cout << " You do not have a pipes for a given filter" << endl;
+template<typename T>
+using Filter = bool(*)(const Truba& tr, T param);
+
+bool CheckByName(const Truba& tr, string param)
+{
+	return tr.name_truba.find(param) != string::npos;
+}
+bool CheckByRepair(const Truba& tr, bool param)
+{
+	return tr.repair == param;
 }
 
-void Delete_pipe(unordered_map <int, Truba>& p, vector <int>& id_filter){
-	if ((id_filter.size()) != 0) {
-		cout << "Enter number of pipes to delete. You have " + to_string(id_filter.size()) + " pipes.";
-		int number_of_pipes = GetCorrect(0, int(id_filter.size()));
-		for (int i = 1; i <= number_of_pipes; i++)
+template<typename T>
+set <int> FindPipesByFilter(const unordered_map <int, Truba>& p, Filter<T> f, T param)
+{
+	set <int> res;
+	int i = 0;
+	for (auto& [id, pipe] : p)
+	{
+		if (f(pipe, param))
+			res.insert(i);
+		i++;
+	}
+
+	return res;
+}
+void Edit_pipe(unordered_map <int, Truba>& p, set <int>& id_filter) {
+	
+	if ((id_filter.size()) == 0)
+	{
+		cout << " You do not have a pipes for a given filter " << endl;
+		return;
+	}
+	cout << "You have " + to_string(id_filter.size()) + " pipes.";
+	cout << "Id filter: ";
+	for (auto i : id_filter)
+		cout << i << " ";
+	cout << "Enter number of pipes to edit.";
+	int number_of_pipes = GetCorrect(0, int(id_filter.size()));
+	set<int>id_selected;
+	for (int i = 1; i <= number_of_pipes; i++)
+	{
+		cout << "Enter id pipe: ";
+		int id = GetCorrect(0, *max_element(id_filter.begin(), id_filter.end()));
+		if (id_filter.find(id) != id_filter.end())
 		{
-			cout << "Enter id pipe: ";
-			int id = GetCorrect(0, int(*max_element(id_filter.begin(), id_filter.end())));
-			if (find(id_filter.begin(), id_filter.end(), id) != id_filter.end()){
-				p.erase(id);
-				vector<int>::iterator itr = std::find(id_filter.begin(), id_filter.end(), id);
-				id_filter.erase(itr);
-			}
+			id_selected.insert(id);
+		}
+		else {
+			cout << "There is no such id in the filter. Please try again " << endl;
+			i = i - 1;
 		}
 	}
-	else
-		cout << " You do not have a pipes for a given filter" << endl;
+	for (int id : id_selected)
+	{
+		Truba& pipe = p[id];
+		pipe.repair = !pipe.repair;
+	}
+
 }
 
-int Edit_or_delet(unordered_map <int, Truba>& p, vector <int>& id_filter) {
+void Delete_pipe(unordered_map <int, Truba>& p, set <int>& id_filter) {
+	if ((id_filter.size()) == 0)
+	{
+		cout << " You do not have a pipes for a given filter " << endl;
+		return;
+	}
+	cout << "You have " + to_string(id_filter.size()) + " pipes.";
+	cout << "Id filter: ";
+	for (auto i : id_filter)
+		cout << i << " ";
+	cout << "Enter number of pipes to delete. ";
+	int number_of_pipes = GetCorrect(0, int(id_filter.size()));
+	set<int>id_selected;
+	for (int i = 1; i <= number_of_pipes; i++)
+	{
+		cout << "Enter id pipe: ";
+		int id = GetCorrect(0, *max_element(id_filter.begin(), id_filter.end()));
+		if (id_filter.find(id) != id_filter.end())
+		{
+			id_selected.insert(id);
+			id_filter.erase(id);
+		}
+		else {
+			cout << "There is no such id in the filter. Please try again" << endl;
+			i = i - 1;
+		}
+	}
+	for (int id : id_selected)
+	{
+		p.erase(id);
+	}
+
+}
+
+int Edit_or_delet(unordered_map <int, Truba>& p, set <int>& id_filter) {
 	while (true)
-	{ 
-		cout << "You have " + to_string(id_filter.size()) + " pipes."<<endl;
+	{
+		cout << "You have " + to_string(id_filter.size()) + " pipes." << endl;
 		cout << "\nSelect menu item:"
 			<< "\n1. Pipe edit"
 			<< "\n2. Pipe delet"
-			<< "\n3. Exit"<<endl;
+			<< "\n3. Exit" << endl;
 		int vibor = -1;
 		vibor = GetCorrect(1, 3);
 		switch (vibor)
 		{
 		case 1:
 		{
-			Edit_pipe(p,id_filter);
+			Edit_pipe(p, id_filter);
 			break;
 		}
 		case 2:
@@ -99,55 +158,41 @@ int Edit_or_delet(unordered_map <int, Truba>& p, vector <int>& id_filter) {
 		}
 	}
 }
-int Filter_pipe(unordered_map <int, Truba>& p)
-{
+int Filter_pipe(unordered_map <int, Truba>& p) {
 
 	cout << "\nSelect menu item:"
 		<< "\n1. Pipe filter by name"
 		<< "\n2. Pipe filter by under repair"
 		<< "\n3. Select all"
-		<<"\n4. Exit"<<endl;
+		<< "\n4. Exit" << endl;
 	int vibor = -1;
 	vibor = GetCorrect(1, 4);
 	switch (vibor)
 	{
 	case 1:
 	{
-		string pipe_name;
-		cout << "Enter name: ";
-		cin.ignore();
-		getline(cin, pipe_name);
-		vector <int> id_filter;
-		for ( auto& pipe1 : p) {
-			Truba& truba1 = pipe1.second;
-			if (truba1.name_truba.find(pipe_name) != string::npos) {
-				id_filter.push_back(truba1.idpipe);
-			}
-		}
-		Edit_or_delet(p,id_filter);
+		cout << "Enter name for filter: ";
+		string name = "Unknown";
+		cin >> name;
+		set <int>id_filter;
+		id_filter = FindPipesByFilter(p, CheckByName, name);
+		Edit_or_delet(p, id_filter);
 		break;
 	}
 	case 2:
 	{
-		bool pipe_repair;
-		cout << "Enter under repair: ";
-		cin >> pipe_repair;
-		vector <int> id_filter;
-		for (auto& pipe2 : p) {
-			Truba& truba2 = pipe2.second;
-			if (truba2.repair == pipe_repair) {
-				id_filter.push_back(truba2.idpipe);
-			}
-		}
+		cout << "Enter repair (0,1) for filter" << endl;
+		bool k = GetCorrect(0, 1);
+		set<int>id_filter;
+		id_filter = FindPipesByFilter(p, CheckByRepair, k);
 		Edit_or_delet(p, id_filter);
 		break;
 	}
 	case 3:
 	{
-		vector <int> id_filter;
-		for (auto& pipe3 : p) {
-			//Truba& truba3 = pipe3.second;
-			id_filter.push_back(pipe3.first);
+		set <int> id_filter;
+		for (auto& [id, pipe] : p) {
+			id_filter.insert(id);
 		}
 		Edit_or_delet(p, id_filter);
 		break;
@@ -165,11 +210,11 @@ istream& operator >> (istream& in, Truba& tr)
 	cout << "Enter name truba:";
 	cin.ignore();
 	getline(cin, tr.name_truba);
-	cout << "Enter lenght:";
+	cout << "Enter lenght (1.0, 10000.0):";
 	tr.lenght = GetCorrect(1.0, 10000.0);
-	cout << "Enter diametr:";
+	cout << "Enter diametr (1, 1400):";
 	tr.diametr = GetCorrect(1, 1400);
-	cout << "Enter repair:";
+	cout << "Enter repair (0, 1):";
 	tr.repair = GetCorrect(0, 1);
 	return in;
 }
@@ -181,7 +226,6 @@ ostream& operator << (ostream& out, const Truba& tr)
 		out << "You do not have pipe" << endl;
 		return out;
 	}
-	/*out << "\nPipe:" << endl;*/
 	out << "\nMaxID: " << Truba::MaxIDTruba
 		<< "\nID: " << tr.idpipe
 		<< "\nPipe name: " << tr.name_truba

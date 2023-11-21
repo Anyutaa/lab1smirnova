@@ -7,6 +7,8 @@
 #include "utils.h"
 #include <chrono>
 #include <format>
+#include <set>
+#include <algorithm>
 
 using namespace std;
 using namespace chrono;
@@ -19,6 +21,7 @@ void Writing_to_file_pipe_cs(unordered_map <int, Truba>& p, unordered_map <int, 
 		return;
 	}
 	else {
+		cout << "Enter file name: ";
 		string filename;
 		cin >> filename;
 		ofstream fout;
@@ -99,6 +102,7 @@ int main()
 		{
 			cout << "4. Filter for pipes" << endl;
 			Filter_pipe(pipes);
+
 			break;
 		}
 		case 5:

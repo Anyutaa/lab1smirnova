@@ -2,6 +2,7 @@
 #include <iostream> 
 #include <fstream>
 #include "utils.h"
+#include <set>
 using namespace std;
 
 int CS::MaxIDCS = 0;
@@ -37,11 +38,11 @@ istream& operator >> (istream& in,  CS& cs)
 	cout << "Enter name CS:";
 	cin.ignore();
 	getline(cin, cs.name_cs);
-	cout << "Enter workshops:";
+	cout << "Enter workshops (1, 1000):";
 	cs.workshops = GetCorrect(1, 1000);
-	cout << "Enter workshops in work:";
+	cout << "Enter workshops in work (0-" << cs.workshops << endl;
 	cs.workshops_work = GetCorrect(0, cs.workshops);
-	cout << "Enter effect:";
+	cout << "Enter effect ('A', 'D'):";
 	cs.effect = GetCorrect('A', 'D');
 	return in;
 }
@@ -63,48 +64,114 @@ ostream& operator << (ostream& out, const CS& cs)
 	return out;
 }
 
-void Edit_cs(unordered_map <int, CS>& cs, vector <int>& id_filter) {
-	if ((id_filter.size()) != 0) {
-		cout << "Enter number of cs to edit.  You have" + to_string(id_filter.size()) + " cs.";
-		int number_of_cs = GetCorrect(0, int(id_filter.size()));
-		for (int i = 1; i <= number_of_cs; i++)
-		{
-			cout << "Enter id pipe: ";
-			int id = GetCorrect(0, int(*max_element(id_filter.begin(), id_filter.end())));
-			if (find(id_filter.begin(), id_filter.end(), id) != id_filter.end()) {
-				CS& station = cs[id];
-				station.workshops_work = GetCorrect(0, station.workshops);
-			}
-		}
-	}
-	else
-		cout << " You do not have a cs for a given filter" << endl;
+template<typename T>
+using Filter = bool(*)(const CS& cs, T param);
+
+bool CheckByName(const CS& cs, string param)
+{
+	return cs.name_cs.find(param) != string::npos;
+}
+bool CheckByWorshopsLess(const CS& tr, int param)
+{
+	return ((tr.workshops - tr.workshops_work) * 100 / tr.workshops) < param;
+}
+bool CheckByWorshopsEqual(const CS& tr, int param)
+{
+	return ((tr.workshops - tr.workshops_work) * 100 / tr.workshops) == param;
+}
+bool CheckByWorshopsMore(const CS& tr, int param)
+{
+	return ((tr.workshops - tr.workshops_work) * 100 / tr.workshops) > param;
 }
 
-void Delete_cs(unordered_map <int, CS>& cs, vector <int>& id_filter) {
-	if ((id_filter.size()) != 0) {
-		cout << "Enter number of cs to delete. You have " + to_string(id_filter.size()) + " cs.";
-		int number_of_cs = GetCorrect(0, int(id_filter.size()));
-		for (int i = 1; i <= number_of_cs; i++)
+
+template<typename T>
+set <int> FindCsByFilter(const unordered_map <int, CS>& cs, Filter<T> f, T param)
+{
+	set <int> res;
+	int i = 0;
+	for (auto& [id, station] : cs)
+	{
+		if (f(station, param))
+			res.insert(i);
+		i++;
+	}
+
+	return res;
+}
+void Edit_cs(unordered_map <int, CS>& cs, set <int>& id_filter) {
+
+	if ((id_filter.size()) == 0)
+	{
+		cout << " You do not have a stations for a given filter " << endl;
+		return;
+	}
+	cout << "You have " + to_string(id_filter.size()) + " cs.";
+	cout << "Id filter: ";
+	for (auto i : id_filter)
+		cout << i << " ";
+	cout << "Enter number of stations to edit.";
+	int number_of_cs = GetCorrect(0, int(id_filter.size()));
+	set<int>id_selected;
+	for (int i = 1; i <= number_of_cs; i++)
+	{
+		cout << "Enter id cs: ";
+		int id = GetCorrect(0, *max_element(id_filter.begin(), id_filter.end()));
+		if (id_filter.find(id) != id_filter.end())
 		{
-			cout << "Enter id station: ";
-			int id = GetCorrect(0, int(*max_element(id_filter.begin(), id_filter.end())));
-			if (find(id_filter.begin(), id_filter.end(), id) != id_filter.end()) {
-				cs.erase(id);
-				vector<int>::iterator itr = std::find(id_filter.begin(), id_filter.end(), id);
-				id_filter.erase(itr);
-				
-			}
+			id_selected.insert(id);
+		}
+		else {
+			cout << "There is no such id in the filter. Please try again " << endl;
+			i = i - 1;
 		}
 	}
-	else
-		cout << " You do not have a cs for a given filter" << endl;
+	for (int id : id_selected)
+	{
+		CS& station = cs[id];
+		station.workshops_work = GetCorrect(0,station.workshops);
+	}
+
 }
 
-int Edit_or_delet_cs(unordered_map <int, CS>& cs, vector <int>& id_filter) {
+void Delete_cs(unordered_map <int, CS>& cs, set <int>& id_filter) {
+	if ((id_filter.size()) == 0)
+	{
+		cout << " You do not have a stations for a given filter " << endl;
+		return;
+	}
+	cout << "You have " + to_string(id_filter.size()) + " cs.";
+	cout << "Id filter: ";
+	for (auto i : id_filter)
+		cout << i << " ";
+	cout << "Enter number of stations to delete. ";
+	int number_of_cs = GetCorrect(0, int(id_filter.size()));
+	set<int>id_selected;
+	for (int i = 1; i <= number_of_cs; i++)
+	{
+		cout << "Enter id cs: ";
+		int id = GetCorrect(0, *max_element(id_filter.begin(), id_filter.end()));
+		if (id_filter.find(id) != id_filter.end())
+		{
+			id_selected.insert(id);
+			id_filter.erase(id);
+		}
+		else {
+			cout << "There is no such id in the filter. Please try again" << endl;
+			i = i - 1;
+		}
+	}
+	for (int id : id_selected)
+	{
+		cs.erase(id);
+	}
+
+}
+
+int Edit_or_delet_cs(unordered_map <int, CS>& cs, set <int>& id_filter) {
 	while (true)
 	{
-		cout << "You have " + to_string(id_filter.size()) + " cs." << endl;
+		cout << "You have " + to_string(id_filter.size()) + " stations." << endl;
 		cout << "\nSelect menu item:"
 			<< "\n1. CS edit"
 			<< "\n2. CS delet"
@@ -131,8 +198,7 @@ int Edit_or_delet_cs(unordered_map <int, CS>& cs, vector <int>& id_filter) {
 		}
 	}
 }
-int Filter_cs(unordered_map <int, CS>& cs)
-{
+int Filter_cs(unordered_map <int, CS>& cs) {
 
 	cout << "\nSelect menu item:"
 		<< "\n1. CS filter by name"
@@ -145,72 +211,50 @@ int Filter_cs(unordered_map <int, CS>& cs)
 	{
 	case 1:
 	{
-		string cs_name;
-		cout << "Enter name: ";
-		cin.ignore();
-		getline(cin, cs_name);
-		vector <int> id_filter;
-		for (auto& cs1 : cs) {
-			CS& station = cs1.second;
-			if (station.name_cs.find(cs_name) != string::npos) {
-				id_filter.push_back(station.idcs);
-			}
-		}
+		cout << "Enter name for filter: ";
+		string name = "Unknown";
+		cin >> name;
+		set <int>id_filter;
+		id_filter = FindCsByFilter(cs, CheckByName, name);
 		Edit_or_delet_cs(cs, id_filter);
 		break;
 	}
 	case 2:
 	{
-		int cs_procent;
 		cout << "Enter procent unusing shops: ";
-		cs_procent=GetCorrect(0,100);
-		vector <int> id_filter;
+		int k = GetCorrect(0, 100);
 		cout << "\nSelect menu item:"
 			<< "\n1. > "
 			<< "\n2. = "
 			<< "\n3. < " << endl;
+		set <int>id_filter;
 		int vibor = GetCorrect(1, 3);
 		switch (vibor)
-		{
-		case 1: {
-			for (auto& cs2 : cs) {
-				CS& station2 = cs2.second;
-				if (((station2.workshops - station2.workshops_work) * 100 / station2.workshops) > cs_procent) {
-					id_filter.push_back(station2.idcs);
-				}
+			{
+			case 1: {
+				
+				id_filter = FindCsByFilter(cs, CheckByWorshopsMore, k);
+				Edit_or_delet_cs(cs, id_filter);
+				break;
 			}
-			Edit_or_delet_cs(cs, id_filter);
-			break;
-		}
-		case 2: {
-			for (auto& cs2 : cs) {
-				CS& station2 = cs2.second;
-				if (((station2.workshops - station2.workshops_work) * 100 / station2.workshops) == cs_procent) {
-					id_filter.push_back(station2.idcs);
-				}
-
+			case 2: {
+				id_filter = FindCsByFilter(cs, CheckByWorshopsEqual, k);
+				Edit_or_delet_cs(cs, id_filter);
+				break;
 			}
-			Edit_or_delet_cs(cs, id_filter);
-			break;
-		}
-		case 3: {
-			for (auto& cs2 : cs) {
-				CS& station2 = cs2.second;
-				if (((station2.workshops - station2.workshops_work) * 100 / station2.workshops) < cs_procent) {
-					id_filter.push_back(station2.idcs);
-				}
+			case 3: {
+				id_filter = FindCsByFilter(cs, CheckByWorshopsLess, k);
+				Edit_or_delet_cs(cs, id_filter);
+				break;
 			}
-			Edit_or_delet_cs(cs, id_filter);
-			break;
-		}
 		}
 		break;
 	}
 	case 3:
 	{
-		vector <int> id_filter;
-		for (auto& cs3 : cs) {
-			id_filter.push_back(cs3.first);
+		set <int> id_filter;
+		for (auto& [id, station] : cs) {
+			id_filter.insert(id);
 		}
 		Edit_or_delet_cs(cs, id_filter);
 		break;
@@ -220,9 +264,9 @@ int Filter_cs(unordered_map <int, CS>& cs)
 		cout << "4. Exit" << endl;
 		return false;
 	}
-
 	}
 }
+
 
 void DataRecordingCS(ofstream& fout, const CS& cs) {
 
@@ -277,54 +321,3 @@ void Read_from_file_cs(unordered_map <int, CS>& s)
 	}
 	fin.close();
 }
-//void Writing_to_file_cs(unordered_map <int, CS>& s)
-//{
-//	string filename;
-//	cin >> filename;
-//	ofstream fout;
-//	fout.open((filename + ".txt"), ios::app);
-//	if ((s.size()) == 0)
-//	{
-//		cout << "No information about pipe " << endl;
-//		return;
-//	}
-//	cout << "Add information about pipe " << endl;
-//	for (const auto& x : s)
-//		DataRecordingCS(fout, x.second);
-//
-//	fout.close();
-//}
-//void Read_from_file_cs(unordered_map <int, CS>& s)
-//{
-//	ifstream fin("lab_smirnova.txt");
-//	if (fin)
-//	{
-//		string name_of_cs = "none";
-//		bool ks = 0;
-//		while (getline(fin, name_of_cs))
-//		{
-//			if (name_of_cs == "Station: ")
-//			{
-//				CS cs;
-//				int m = 0;
-//				fin >> m;
-//				fin >> cs.MaxIDCS;
-//				fin >> cs.idcs;
-//				getline(fin, cs.name_cs);
-//				fin >> cs.workshops;
-//				fin >> cs.workshops_work;
-//				fin >> cs.effect;
-//				s.insert({ m,cs });
-//				ks = true;
-//			}
-//		}
-//		if (!ks)
-//		{
-//			cout << "No information about station." << endl;
-//		}
-//		else
-//			return OutputCs(s);
-//	}
-//	fin.close();
-////}
-//
