@@ -175,8 +175,15 @@ int Edit_or_delet(unordered_map <int, Truba>& p, set <int>& id_filter) {
 		}
 	}
 }
-int Truba_CS::Filter_pipe(unordered_map <int, Truba>& p) {
-
+bool Truba_CS::Filter_pipe(unordered_map <int, Truba>& p) {
+	if (p.size()==0){
+		cout << "You do not have pipe" << endl;
+		return false;
+	}
+	if (p.size() == 1) {
+		cout << "Why do you need a filter for one pipe" << endl;
+		return false;
+	}
 	cout << "\nSelect menu item:"
 		<< "\n1. Pipe filter by name"
 		<< "\n2. Pipe filter by under repair"
@@ -194,7 +201,11 @@ int Truba_CS::Filter_pipe(unordered_map <int, Truba>& p) {
 		cerr << name << endl;
 		set <int>id_filter;
 		id_filter = FindPipesByFilter(p, CheckByName, name);
-		Edit_or_delet(p, id_filter);
+		if (id_filter.size()) {
+			Edit_or_delet(p, id_filter);
+		}
+		else
+			cout << "There are no suitable pipes" << endl;
 		break;
 	}
 	case 2:
@@ -203,7 +214,11 @@ int Truba_CS::Filter_pipe(unordered_map <int, Truba>& p) {
 		bool k = GetCorrect(0, 1);
 		set<int>id_filter;
 		id_filter = FindPipesByFilter(p, CheckByRepair, k);
-		Edit_or_delet(p, id_filter);
+		if (id_filter.size()) {
+			Edit_or_delet(p, id_filter);
+		}
+		else
+			cout << "There are no suitable pipes" << endl;
 		break;
 	}
 	case 3:
@@ -212,7 +227,11 @@ int Truba_CS::Filter_pipe(unordered_map <int, Truba>& p) {
 		for (auto& [id, pipe] : p) {
 			id_filter.insert(id);
 		}
-		Edit_or_delet(p, id_filter);
+		if (id_filter.size()) {
+			Edit_or_delet(p, id_filter);
+		}
+		else
+			cout << "There are no suitable pipes" << endl;
 		break;
 	}
 	case 4:
@@ -359,8 +378,15 @@ int Edit_or_delet_cs(unordered_map <int, CS>& cs, set <int>& id_filter) {
 		}
 	}
 }
-int Truba_CS::Filter_cs(unordered_map <int, CS>& cs) {
-
+bool Truba_CS::Filter_cs(unordered_map <int, CS>& cs) {
+	if (cs.size() == 0) {
+		cout << "You do not have cs" << endl;
+		return false;
+	}
+	if (cs.size() == 1) {
+		cout << "Why do you need a filter for one cs" << endl;
+		return false;
+	}
 	cout << "\nSelect menu item:"
 		<< "\n1. CS filter by name"
 		<< "\n2. CS filter by % of unused workshops"
@@ -378,7 +404,11 @@ int Truba_CS::Filter_cs(unordered_map <int, CS>& cs) {
 		cerr << name << endl;
 		set <int>id_filter;
 		id_filter = FindCsByFilter(cs, CheckByName, name);
-		Edit_or_delet_cs(cs, id_filter);
+		if (id_filter.size()) {
+			Edit_or_delet_cs(cs, id_filter);
+		}
+		else
+			cout<<"There are no suitable cs" << endl;
 		break;
 	}
 	case 2:
@@ -396,17 +426,31 @@ int Truba_CS::Filter_cs(unordered_map <int, CS>& cs) {
 		case 1: {
 
 			id_filter = FindCsByFilter(cs, CheckByWorshopsMore, k);
-			Edit_or_delet_cs(cs, id_filter);
+			if (id_filter.size()) {
+				Edit_or_delet_cs(cs, id_filter);
+			}
+			else
+				cout << "There are no suitable cs" << endl;
+			
 			break;
 		}
 		case 2: {
 			id_filter = FindCsByFilter(cs, CheckByWorshopsEqual, k);
-			Edit_or_delet_cs(cs, id_filter);
+			if (id_filter.size()) {
+				Edit_or_delet_cs(cs, id_filter);
+			}
+			else
+				cout << "There are no suitable cs" << endl;
+			
 			break;
 		}
 		case 3: {
 			id_filter = FindCsByFilter(cs, CheckByWorshopsLess, k);
-			Edit_or_delet_cs(cs, id_filter);
+			if (id_filter.size()) {
+				Edit_or_delet_cs(cs, id_filter);
+			}
+			else
+				cout << "There are no suitable cs" << endl;
 			break;
 		}
 		}
