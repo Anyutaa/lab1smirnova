@@ -25,20 +25,22 @@ int main()
 		cerr_out.redirect(logfile);
 	unordered_map < int, Truba > pipes;
 	unordered_map < int, CS > stations;
+	vector<Truba_CS> connection;
 	while (true)
 	{
 		cout << "\nSelect menu item:"
 			<< "\n1. Add pipe"
 			<< "\n2. Add CS"
-			<< "\n3. View all objects"
+			<< "\n3. View all objects and connections"
 			<< "\n4. Filter for pipes"
 			<< "\n5. Filter for cs"
 			<< "\n6. Save"
 			<< "\n7. Download"
-			<< "\n8. Exit"
+			<< "\n8. Connection"
+			<<"\n9. Exit"
 			<< "\nChoose action ";
 		int vibor = -1;
-		vibor = GetCorrect(1,8);
+		vibor = GetCorrect(1,9);
 		switch (vibor)
 		{
 		case 1:
@@ -53,22 +55,23 @@ int main()
 		}
 		case 3:
 		{
-			cout << "3. View all objects" << endl;
+			cout << "3. View all objects and connections" << endl;
 			gts.OutputPipe(pipes);
 			gts.OutputCs(stations);
+			gts.All_connections(connection);
 			break;
 		}
 		case 4:
 		{
 			cout << "4. Filter for pipes" << endl;
-			gts.Filter_pipe(pipes);
+			gts.Filter_pipe(pipes, stations, connection);
 
 			break;
 		}
 		case 5:
 		{
 			cout << "5. Filter for cs" << endl;
-			gts.Filter_cs(stations);
+			gts.Filter_cs(pipes,stations, connection);
 			break;
 		}
 		case 6:
@@ -86,7 +89,13 @@ int main()
 		}
 		case 8:
 		{
-			cout << "8. Exit" << endl;
+			cout << "8. Connection" << endl;
+			gts.Connection(pipes, stations, connection);
+			break;
+		}
+		case 9:
+		{
+			cout << "9. Exit" << endl;
 			return false;
 		}
 		}

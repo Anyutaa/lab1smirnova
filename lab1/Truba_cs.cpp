@@ -110,7 +110,7 @@ void Edit_pipe(unordered_map <int, Truba>& p, set <int>& id_filter) {
 
 }
 
-void Delete_pipe(unordered_map <int, Truba>& p, set <int>& id_filter) {
+void Delete_pipe(unordered_map <int, Truba>& p, unordered_map <int, CS>& cs, set <int>& id_filter, vector<Truba_CS>& connection) {
 	if ((id_filter.size()) == 0)
 	{
 		cout << " You do not have a pipes for a given filter " << endl;
@@ -131,6 +131,15 @@ void Delete_pipe(unordered_map <int, Truba>& p, set <int>& id_filter) {
 		{
 			id_selected.insert(id);
 			id_filter.erase(id);
+			for (int i = 0; i < connection.size(); i++) {
+				Truba_CS Connect;
+				Connect = connection[i];
+				if (id == Connect.id_pipe) {
+					connection.erase(connection.begin() + i);
+					cs[Connect.id_entry].id_input -= 1;
+					cs[Connect.id_outlet].id_output -= 1;
+				}
+			}
 		}
 		else {
 			cout << "There is no such id in the filter. Please try again" << endl;
@@ -145,7 +154,7 @@ void Delete_pipe(unordered_map <int, Truba>& p, set <int>& id_filter) {
 
 }
 
-int Edit_or_delet(unordered_map <int, Truba>& p, set <int>& id_filter) {
+int Edit_or_delet(unordered_map <int, Truba>& p, unordered_map <int, CS>& cs, set <int>& id_filter,  vector<Truba_CS>& connection) {
 	while (true)
 	{
 		cout << "You have " + to_string(id_filter.size()) + " pipes." << endl;
@@ -164,7 +173,7 @@ int Edit_or_delet(unordered_map <int, Truba>& p, set <int>& id_filter) {
 		}
 		case 2:
 		{
-			Delete_pipe(p, id_filter);
+			Delete_pipe(p,cs, id_filter,connection);
 			break;
 		}
 		case 3:
@@ -175,7 +184,7 @@ int Edit_or_delet(unordered_map <int, Truba>& p, set <int>& id_filter) {
 		}
 	}
 }
-bool Truba_CS::Filter_pipe(unordered_map <int, Truba>& p) {
+bool Truba_CS::Filter_pipe(unordered_map <int, Truba>& p, unordered_map <int, CS>& cs, vector<Truba_CS>& connection) {
 	if (p.size()==0){
 		cout << "You do not have pipe" << endl;
 		return false;
@@ -202,7 +211,7 @@ bool Truba_CS::Filter_pipe(unordered_map <int, Truba>& p) {
 		set <int>id_filter;
 		id_filter = FindPipesByFilter(p, CheckByName, name);
 		if (id_filter.size()) {
-			Edit_or_delet(p, id_filter);
+			Edit_or_delet(p,cs, id_filter,connection);
 		}
 		else
 			cout << "There are no suitable pipes" << endl;
@@ -215,7 +224,7 @@ bool Truba_CS::Filter_pipe(unordered_map <int, Truba>& p) {
 		set<int>id_filter;
 		id_filter = FindPipesByFilter(p, CheckByRepair, k);
 		if (id_filter.size()) {
-			Edit_or_delet(p, id_filter);
+			Edit_or_delet(p,cs, id_filter,connection);
 		}
 		else
 			cout << "There are no suitable pipes" << endl;
@@ -228,7 +237,7 @@ bool Truba_CS::Filter_pipe(unordered_map <int, Truba>& p) {
 			id_filter.insert(id);
 		}
 		if (id_filter.size()) {
-			Edit_or_delet(p, id_filter);
+			Edit_or_delet(p,cs, id_filter,connection);
 		}
 		else
 			cout << "There are no suitable pipes" << endl;
@@ -307,13 +316,14 @@ void Edit_cs(unordered_map <int, CS>& cs, set <int>& id_filter) {
 	for (int id : id_selected)
 	{
 		CS& station = cs[id];
+		cout << "Enter worshops in work: ";
 		station.workshops_work = GetCorrect(0, station.workshops);
-		cout << "You edit " << id << " cs." << endl;
+		cout << "You edit id" << id << " cs." << endl;
 	}
 
 }
 
-void Delete_cs(unordered_map <int, CS>& cs, set <int>& id_filter) {
+void Delete_cs(unordered_map <int, Truba>& p,unordered_map <int, CS>& cs, set <int>& id_filter, vector<Truba_CS>& connection) {
 	if ((id_filter.size()) == 0)
 	{
 		cout << " You do not have a stations for a given filter " << endl;
@@ -334,6 +344,20 @@ void Delete_cs(unordered_map <int, CS>& cs, set <int>& id_filter) {
 		{
 			id_selected.insert(id);
 			id_filter.erase(id);
+			for (int i = 0; i < connection.size() ; i++) {
+				Truba_CS Connect;
+				Connect = connection[i];
+				if (id == Connect.id_entry) {
+					connection.erase(connection.begin() + i);
+					cs[Connect.id_outlet].id_output -= 1;
+					p[Connect.id_pipe].free = 1;
+				}
+				if (id == Connect.id_outlet) {
+					connection.erase(connection.begin() + i);
+					cs[Connect.id_entry].id_input -= 1;
+					p[Connect.id_pipe].free = 1;
+				}
+			}
 		}
 		else {
 			cout << "There is no such id in the filter. Please try again" << endl;
@@ -348,9 +372,12 @@ void Delete_cs(unordered_map <int, CS>& cs, set <int>& id_filter) {
 
 }
 
-int Edit_or_delet_cs(unordered_map <int, CS>& cs, set <int>& id_filter) {
+int Edit_or_delet_cs(unordered_map <int, Truba>& p,unordered_map <int, CS>& cs, set <int>& id_filter, vector<Truba_CS>& connection) {
 	while (true)
 	{
+		for (auto& id : id_filter) {
+			cout << cs[id] << endl;
+		}
 		cout << "You have " + to_string(id_filter.size()) + " stations on the filter." << endl;
 		cout << "\nSelect menu item:"
 			<< "\n1. CS edit"
@@ -367,7 +394,7 @@ int Edit_or_delet_cs(unordered_map <int, CS>& cs, set <int>& id_filter) {
 		}
 		case 2:
 		{
-			Delete_cs(cs, id_filter);
+			Delete_cs(p,cs, id_filter, connection);
 			break;
 		}
 		case 3:
@@ -378,7 +405,8 @@ int Edit_or_delet_cs(unordered_map <int, CS>& cs, set <int>& id_filter) {
 		}
 	}
 }
-bool Truba_CS::Filter_cs(unordered_map <int, CS>& cs) {
+
+bool Truba_CS::Filter_cs(unordered_map <int, Truba>& p,unordered_map <int, CS>& cs, vector<Truba_CS>& connection) {
 	if (cs.size() == 0) {
 		cout << "You do not have cs" << endl;
 		return false;
@@ -387,6 +415,7 @@ bool Truba_CS::Filter_cs(unordered_map <int, CS>& cs) {
 		cout << "Why do you need a filter for one cs" << endl;
 		return false;
 	}
+	
 	cout << "\nSelect menu item:"
 		<< "\n1. CS filter by name"
 		<< "\n2. CS filter by % of unused workshops"
@@ -405,7 +434,7 @@ bool Truba_CS::Filter_cs(unordered_map <int, CS>& cs) {
 		set <int>id_filter;
 		id_filter = FindCsByFilter(cs, CheckByName, name);
 		if (id_filter.size()) {
-			Edit_or_delet_cs(cs, id_filter);
+			Edit_or_delet_cs(p,cs, id_filter, connection);
 		}
 		else
 			cout<<"There are no suitable cs" << endl;
@@ -427,7 +456,7 @@ bool Truba_CS::Filter_cs(unordered_map <int, CS>& cs) {
 
 			id_filter = FindCsByFilter(cs, CheckByWorshopsMore, k);
 			if (id_filter.size()) {
-				Edit_or_delet_cs(cs, id_filter);
+				Edit_or_delet_cs(p,cs, id_filter,connection);
 			}
 			else
 				cout << "There are no suitable cs" << endl;
@@ -437,7 +466,7 @@ bool Truba_CS::Filter_cs(unordered_map <int, CS>& cs) {
 		case 2: {
 			id_filter = FindCsByFilter(cs, CheckByWorshopsEqual, k);
 			if (id_filter.size()) {
-				Edit_or_delet_cs(cs, id_filter);
+				Edit_or_delet_cs(p,cs, id_filter,connection);
 			}
 			else
 				cout << "There are no suitable cs" << endl;
@@ -447,7 +476,7 @@ bool Truba_CS::Filter_cs(unordered_map <int, CS>& cs) {
 		case 3: {
 			id_filter = FindCsByFilter(cs, CheckByWorshopsLess, k);
 			if (id_filter.size()) {
-				Edit_or_delet_cs(cs, id_filter);
+				Edit_or_delet_cs(p,cs, id_filter,connection);
 			}
 			else
 				cout << "There are no suitable cs" << endl;
@@ -462,7 +491,7 @@ bool Truba_CS::Filter_cs(unordered_map <int, CS>& cs) {
 		for (auto& [id, station] : cs) {
 			id_filter.insert(id);
 		}
-		Edit_or_delet_cs(cs, id_filter);
+		Edit_or_delet_cs(p,cs, id_filter,connection);
 		break;
 	}
 	case 4:
@@ -593,4 +622,127 @@ void Truba_CS::Read_from_file_cs(unordered_map <int, CS>& s)
 			return OutputCs(s);
 	}
 	fin.close();
+}
+
+void Truba_CS::Connection(unordered_map <int, Truba>& p, unordered_map <int, CS>& s ,vector<Truba_CS>& connection) {
+	if (s.size() == 0) {
+		cout << "You do not have stations.";
+		return;
+	}
+	if (p.size() == 0) {
+		cout << "You do not have pipes.";
+		return;
+	}
+	int k = 0;
+	vector<int>free_cs;
+	for (auto& [id, station] : s) {
+		if (station.id_input + station.id_output < 2) {
+			k += 1;
+			free_cs.push_back(id);
+		}
+	}
+	if (k < 2){
+		cout << "You do not have free stations";
+		return;
+	}
+	vector<int>free_pipe;
+	int n = 0;
+	for (auto& [id, pipe] : p) {
+		if (pipe.free) {
+			n += 1;
+			free_pipe.push_back(id);
+		}
+	}
+	if (n < 1) {
+		cout << "You do not have free pipe";
+		return;
+	}
+	Truba_CS pipe_connect;
+	cout << "Enter the pipe entry ID - CS ";
+	cin >> pipe_connect.id_entry;
+	if (find(free_cs.begin(),free_cs.end(),pipe_connect.id_entry) == free_cs.end()) {
+		while (true) {
+			cout << "Enter the value again, no such id.  ";
+			cin >> pipe_connect.id_entry;
+			if (find(free_cs.begin(), free_cs.end(), pipe_connect.id_entry) != free_cs.end()) {
+				s[pipe_connect.id_entry].id_input += 1;
+				break;
+			}
+		}
+	}
+	else s[pipe_connect.id_entry].id_input += 1;
+	cout << "Enter the ID of the pipe outlet ";
+	cin >> pipe_connect.id_outlet;
+	if (find(free_cs.begin(), free_cs.end(), pipe_connect.id_outlet) == free_cs.end() || pipe_connect.id_outlet == pipe_connect.id_entry) {
+		while (true) {
+			cout << "Enter the value again, no such id ";
+			cin >> pipe_connect.id_outlet;
+			if (find(free_cs.begin(), free_cs.end(), pipe_connect.id_outlet) != free_cs.end() && pipe_connect.id_outlet != pipe_connect.id_entry) {
+				s[pipe_connect.id_outlet].id_output += 1;
+				break;
+			}
+		}
+	}
+	else s[pipe_connect.id_outlet].id_output += 1;
+	int pipe_diametr;
+	int i = 0;
+	while (true) {
+		cout << "Enter diametr of pipe that you want (500, 700, 1000, 1400):";
+		while (true) {
+			pipe_diametr = GetCorrect(500, 1400);
+			if (pipe_diametr != 500 && pipe_diametr != 700 && pipe_diametr != 1000 && pipe_diametr != 1400)
+				cout << "Enter diametr of pipe that you want(500, 700, 1000, 1400): " << endl;
+			else
+				break;
+		}
+		for (auto& id_pip : free_pipe) {
+			if (p[id_pip].diametr == pipe_diametr) {
+				pipe_connect.id_pipe = id_pip;
+				i += 1;
+				p[id_pip].free = 0;
+				break;
+			}
+		}
+		if (i == 1) {
+			connection.push_back(pipe_connect);
+			cout << "You add connection" << endl;
+			break;
+		}
+		else {
+			cout << "You do not have free pipes with diametr that you enter. Let's create. " << endl;
+			int available_pipe_id = Add_newpipe_connect(p, pipe_diametr);
+			cout << "Created a new pipe with ID " << available_pipe_id << " and diameter " << pipe_diametr << endl;
+			pipe_connect.id_pipe = available_pipe_id;
+			p[available_pipe_id].free = 0;
+			connection.push_back(pipe_connect);
+			break;	
+		}
+	}
+	cout << "All connections" << endl;
+	for (auto& connect : connection) {
+		cout << connect.id_entry << connect.id_pipe << connect.id_outlet << endl;
+	}
+
+} 
+int Truba_CS::Add_newpipe_connect(unordered_map<int, Truba>& pipe, int diameter) {
+	Truba tr1;
+	cin >> tr1;
+	if (!(tr1.diametr == diameter))
+	{
+		tr1.diametr = diameter;
+		cout << "!!!Your diameter has been changed to the previously entered one: " << diameter << endl;
+	}
+	int new_pipe_id = tr1.get_idp();
+	pipe.insert({ new_pipe_id, tr1 });
+	return new_pipe_id;
+}
+void Truba_CS::All_connections(vector<Truba_CS>& connection) {
+	if (connection.size() == 0) {
+		cout << "You do not have connections.";
+		return;
+	}
+	cout << "Connections"<< endl;
+	for (auto& connect : connection) {
+		cout << "Id entry: " << connect.id_entry << " Id pipe: " << connect.id_pipe << " Id outlet: " << connect.id_outlet << endl;
+	}
 }

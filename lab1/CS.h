@@ -15,6 +15,8 @@ public:
 	string name_cs = "None";
 	int workshops = 0;
 	int workshops_work = 0;
+	int id_input= 0;
+	int id_output = 0;
 	CS();
 	int get_idc() { return idcs; };
 	friend istream& operator >> (istream& in, CS& cs);

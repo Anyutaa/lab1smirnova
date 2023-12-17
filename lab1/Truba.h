@@ -6,15 +6,15 @@ using namespace std;
 class Truba
 {
 private:
-	
 	double lenght = 0;
-	int diametr = 0;
 	int idpipe = 0;
 	static int MaxIDTruba;
 	
 public:
+	int diametr = 0;
 	string name_truba = "None";
 	bool repair = false;
+	bool free = 1;
 	Truba();
 	int get_idp() { return idpipe; };
 	friend istream& operator >> (istream& in, Truba& tr);

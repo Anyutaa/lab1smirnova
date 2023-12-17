@@ -40,7 +40,9 @@ ostream& operator << (ostream& out, const CS& cs)
 		<< "\nCs name:" << cs.name_cs
 		<< "\nNumber of workshops of the Cs:" << cs.workshops
 		<< "\nNumber of workshops in operation of the Cs:" << cs.workshops_work
-		<< "\nCS efficiency: " << cs.effect << endl;
+		<< "\nCS efficiency: " << cs.effect 
+		<< "\nNumber of entry pipes: " << cs.id_input 
+		<< "\nNumber of outlet pipes: " << cs.id_output << endl;
 	return out;
 }
 
