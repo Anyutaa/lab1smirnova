@@ -37,10 +37,11 @@ int main()
 			<< "\n6. Save"
 			<< "\n7. Download"
 			<< "\n8. Connection"
-			<<"\n9. Exit"
+			<< "\n9. Topological sort"
+			<<"\n10. Exit"
 			<< "\nChoose action ";
 		int vibor = -1;
-		vibor = GetCorrect(1,9);
+		vibor = GetCorrect(1,10);
 		switch (vibor)
 		{
 		case 1:
@@ -95,7 +96,20 @@ int main()
 		}
 		case 9:
 		{
-			cout << "9. Exit" << endl;
+			cout<<"9. Topological sort" << endl;
+			/*vector<int>sort;
+			sort = gts.topologicalSort(connection);
+			cout << "Topological Order: ";
+			for (int i = 0; i < sort.size(); i++) {
+				cout << sort[i] << " ";
+			}*/
+			gts.topologicalSort(connection);
+
+			break;
+		}
+		case 10:
+		{
+			cout << "10. Exit" << endl;
 			return false;
 		}
 		}

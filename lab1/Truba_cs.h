@@ -24,4 +24,6 @@ public:
 	void Connection(unordered_map <int, Truba>& p, unordered_map <int, CS>& s, vector<Truba_CS>& connection);
 	int Add_newpipe_connect(unordered_map<int, Truba>& pipe, int diameter);
 	void All_connections(vector<Truba_CS>& connection);
+	void topologicalSort(vector<Truba_CS>& graph);
+	//vector<int> topologicalSort(vector<Truba_CS>& graph);
 };

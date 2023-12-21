@@ -7,6 +7,8 @@
 #include "utils.h"
 #include <unordered_map>
 #include <set>
+#include <queue>
+#include <stack>
 
 void Truba_CS::Add_pipe(unordered_map < int, Truba >& pipes) {
 	Truba pipe;
@@ -746,3 +748,155 @@ void Truba_CS::All_connections(vector<Truba_CS>& connection) {
 		cout << "Id entry: " << connect.id_entry << " Id pipe: " << connect.id_pipe << " Id outlet: " << connect.id_outlet << endl;
 	}
 }
+//void Truba_CS::Topological_sort(vector<Truba_CS>& graph) {
+
+//}
+
+//void topologicalSortUtil(int v, vector<vector<int>>& adj, vector<bool>& visited, vector<bool>& onStack, stack<int>& s, bool& hasCycle) {
+//	visited[v] = true;
+//	onStack[v] = true;
+//
+//	for (int i = 0; i < adj[v].size(); ++i) {
+//		int neighbor = adj[v][i];
+//		if (!visited[neighbor]) {
+//			topologicalSortUtil(neighbor, adj, visited, onStack, s, hasCycle);
+//		}
+//		else if (onStack[neighbor]) {
+//			// ќбнаружен цикл
+//			hasCycle = true;
+//			return;
+//		}
+//	}
+//
+//	onStack[v] = false;
+//	s.push(v);
+//}
+//	
+//
+//vector<int> Truba_CS::topologicalSort(vector<Truba_CS>& graph) {
+//	int numVertices = graph.size();
+//
+//	// Build adjacency list
+//	vector<vector<int>> adj(numVertices, vector<int>());
+//
+//	for (int i = 0; i < numVertices; ++i) {
+//		for (int j = 0; j < numVertices; ++j) {
+//			if (i != j && graph[i].id_outlet == graph[j].id_entry) {
+//				adj[i].push_back(j);
+//			}
+//		}
+//	}
+//
+//	// Topological sort using DFS with cycle detection
+//	stack<int> s;
+//	vector<bool> visited(numVertices, false);
+//	vector<bool> onStack(numVertices, false);
+//	bool hasCycle = false;
+//
+//	for (int i = 0; i < numVertices; ++i) {
+//		if (!visited[i] && !hasCycle) {
+//			topologicalSortUtil(i, adj, visited, onStack, s, hasCycle);
+//		}
+//	}
+//
+//	if (hasCycle) {
+//		cout << "Graph contains a cycle." << endl;
+//		return vector<int>(); // ¬озвращаем пустой вектор, так как топологическую сортировку нельз€ выполнить в графе с циклом.
+//	}
+//
+//	// Collect the result from the stack
+//	vector<int> result;
+//	while (!s.empty()) {
+//		result.push_back(graph[s.top()].id_outlet);
+//		result.push_back(graph[s.top()].id_entry);
+//		s.pop();
+//	}
+//
+//	return result;
+//}
+//
+
+bool isCyclicUtil(int v, vector<Truba_CS>& graph, vector<bool>& visited, vector<bool>& recStack) {
+	if (!visited[v]) {
+		visited[v] = true;
+		recStack[v] = true;
+
+		for (auto edge : graph) {
+			if (edge.id_entry == v) {
+				int i = edge.id_outlet;
+				if (!visited[i] && isCyclicUtil(i, graph, visited, recStack))
+					return true;
+				else if (recStack[i])
+					return true;
+			}
+		}
+	}
+
+	recStack[v] = false;
+	return false;
+}
+
+bool isCyclic(vector<Truba_CS>& graph, int n) {
+	vector<bool> visited(n, false);
+	vector<bool> recStack(n, false);
+
+	for (int v = 0; v < n; v++) {
+		if (isCyclicUtil(v, graph, visited, recStack))
+			return true;
+	}
+
+	return false;
+}
+
+void topologicalSortUtil(int v, vector<Truba_CS>& graph, vector<bool>& visited, stack<int>& stack) {
+	visited[v] = true;
+	for (auto edge : graph) {
+		if (edge.id_entry == v) {
+			int i = edge.id_outlet;
+			if (!visited[i])
+				topologicalSortUtil(i, graph, visited, stack);
+		}
+	}
+	stack.push(v);
+}
+
+void Truba_CS::topologicalSort(vector<Truba_CS>& graph) {
+	if (graph.size() == 0) {
+		cout << "You do not have graph!!!!" << endl;
+		return;
+	}
+	set<int>vertex;
+	for (auto& edge : graph) {
+		vertex.insert(edge.id_entry);
+		vertex.insert(edge.id_outlet);
+	}
+	int n = size(vertex);
+	vector<bool> visited(n, false);
+	stack<int> stack;
+
+	for (int v = 0; v < n; v++) {
+		if (!visited[v])
+			topologicalSortUtil(v, graph, visited, stack);
+	}
+
+	vector<int> result;
+	while (!stack.empty()) {
+		result.push_back(stack.top());
+		stack.pop();
+	}
+
+	if (isCyclic(graph, n)) {
+		cout << "Graph have cycle.\n";
+	}
+	else {
+		cout << "Topologically sorted list of vertices: ";
+		for (int v : result) {
+			cout << v << " ";
+		}
+		cout << endl;
+	}
+
+	
+}
+
+
