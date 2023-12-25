@@ -17,6 +17,7 @@ public:
 	int workshops_work = 0;
 	int id_input= 0;
 	int id_output = 0;
+	int shortest_path = 0;
 	CS();
 	int get_idc() { return idcs; };
 	friend istream& operator >> (istream& in, CS& cs);

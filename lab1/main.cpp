@@ -38,10 +38,12 @@ int main()
 			<< "\n7. Download"
 			<< "\n8. Connection"
 			<< "\n9. Topological sort"
-			<<"\n10. Exit"
+			<<"\n10. Shortest path"
+			<<"\n11. Max flow"
+			<<"\n12. Exit"
 			<< "\nChoose action ";
 		int vibor = -1;
-		vibor = GetCorrect(1,10);
+		vibor = GetCorrect(1,12);
 		switch (vibor)
 		{
 		case 1:
@@ -97,19 +99,24 @@ int main()
 		case 9:
 		{
 			cout<<"9. Topological sort" << endl;
-			/*vector<int>sort;
-			sort = gts.topologicalSort(connection);
-			cout << "Topological Order: ";
-			for (int i = 0; i < sort.size(); i++) {
-				cout << sort[i] << " ";
-			}*/
-			gts.topologicalSort(connection);
-
+			gts.topologicalSort(connection,stations);
 			break;
 		}
 		case 10:
 		{
-			cout << "10. Exit" << endl;
+			cout << "10. Shortest path " << endl;
+			gts.dekstra(pipes,connection,stations);
+			break;
+		}
+		case 11:
+		{
+			cout << "11. Max flow" << endl;
+			gts.fordFulkerson(connection, pipes,stations);
+			break;
+		}
+		case 12:
+		{
+			cout << "12. Exit" << endl;
 			return false;
 		}
 		}

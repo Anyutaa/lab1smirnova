@@ -24,6 +24,8 @@ public:
 	void Connection(unordered_map <int, Truba>& p, unordered_map <int, CS>& s, vector<Truba_CS>& connection);
 	int Add_newpipe_connect(unordered_map<int, Truba>& pipe, int diameter);
 	void All_connections(vector<Truba_CS>& connection);
-	void topologicalSort(vector<Truba_CS>& graph);
+	void topologicalSort(vector<Truba_CS>& graph, unordered_map <int, CS>& s);
+	void dekstra(unordered_map<int, Truba >& pipes, vector<Truba_CS>& graph, unordered_map<int, CS>& ks);
+	void fordFulkerson(vector<Truba_CS>& graph, unordered_map<int, Truba>& pipe , unordered_map<int, CS>& ks);
 	//vector<int> topologicalSort(vector<Truba_CS>& graph);
 };

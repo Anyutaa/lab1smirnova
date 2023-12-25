@@ -6,11 +6,12 @@ using namespace std;
 class Truba
 {
 private:
-	double lenght = 0;
+	
 	int idpipe = 0;
 	static int MaxIDTruba;
 	
 public:
+	double lenght = 0;
 	int diametr = 0;
 	string name_truba = "None";
 	bool repair = false;

@@ -9,6 +9,8 @@
 #include <set>
 #include <queue>
 #include <stack>
+#include <algorithm>
+
 
 void Truba_CS::Add_pipe(unordered_map < int, Truba >& pipes) {
 	Truba pipe;
@@ -272,7 +274,6 @@ bool CheckByWorshopsMore(const CS& tr, int param)
 {
 	return ((tr.workshops - tr.workshops_work) * 100 / tr.workshops) > param;
 }
-
 
 template<typename T>
 set <int> FindCsByFilter(const unordered_map <int, CS>& cs, Filter1<T> f, T param)
@@ -748,73 +749,6 @@ void Truba_CS::All_connections(vector<Truba_CS>& connection) {
 		cout << "Id entry: " << connect.id_entry << " Id pipe: " << connect.id_pipe << " Id outlet: " << connect.id_outlet << endl;
 	}
 }
-//void Truba_CS::Topological_sort(vector<Truba_CS>& graph) {
-
-//}
-
-//void topologicalSortUtil(int v, vector<vector<int>>& adj, vector<bool>& visited, vector<bool>& onStack, stack<int>& s, bool& hasCycle) {
-//	visited[v] = true;
-//	onStack[v] = true;
-//
-//	for (int i = 0; i < adj[v].size(); ++i) {
-//		int neighbor = adj[v][i];
-//		if (!visited[neighbor]) {
-//			topologicalSortUtil(neighbor, adj, visited, onStack, s, hasCycle);
-//		}
-//		else if (onStack[neighbor]) {
-//			// ќбнаружен цикл
-//			hasCycle = true;
-//			return;
-//		}
-//	}
-//
-//	onStack[v] = false;
-//	s.push(v);
-//}
-//	
-//
-//vector<int> Truba_CS::topologicalSort(vector<Truba_CS>& graph) {
-//	int numVertices = graph.size();
-//
-//	// Build adjacency list
-//	vector<vector<int>> adj(numVertices, vector<int>());
-//
-//	for (int i = 0; i < numVertices; ++i) {
-//		for (int j = 0; j < numVertices; ++j) {
-//			if (i != j && graph[i].id_outlet == graph[j].id_entry) {
-//				adj[i].push_back(j);
-//			}
-//		}
-//	}
-//
-//	// Topological sort using DFS with cycle detection
-//	stack<int> s;
-//	vector<bool> visited(numVertices, false);
-//	vector<bool> onStack(numVertices, false);
-//	bool hasCycle = false;
-//
-//	for (int i = 0; i < numVertices; ++i) {
-//		if (!visited[i] && !hasCycle) {
-//			topologicalSortUtil(i, adj, visited, onStack, s, hasCycle);
-//		}
-//	}
-//
-//	if (hasCycle) {
-//		cout << "Graph contains a cycle." << endl;
-//		return vector<int>(); // ¬озвращаем пустой вектор, так как топологическую сортировку нельз€ выполнить в графе с циклом.
-//	}
-//
-//	// Collect the result from the stack
-//	vector<int> result;
-//	while (!s.empty()) {
-//		result.push_back(graph[s.top()].id_outlet);
-//		result.push_back(graph[s.top()].id_entry);
-//		s.pop();
-//	}
-//
-//	return result;
-//}
-//
 
 bool isCyclicUtil(int v, vector<Truba_CS>& graph, vector<bool>& visited, vector<bool>& recStack) {
 	if (!visited[v]) {
@@ -848,35 +782,38 @@ bool isCyclic(vector<Truba_CS>& graph, int n) {
 	return false;
 }
 
-void topologicalSortUtil(int v, vector<Truba_CS>& graph, vector<bool>& visited, stack<int>& stack) {
+void topologicalSortUtil(int v, vector<Truba_CS>& graph, vector<bool>& visited, stack<int>& stack, set<int>vertexes) {
 	visited[v] = true;
 	for (auto edge : graph) {
 		if (edge.id_entry == v) {
 			int i = edge.id_outlet;
 			if (!visited[i])
-				topologicalSortUtil(i, graph, visited, stack);
+				topologicalSortUtil(i, graph, visited, stack,vertexes);
 		}
 	}
 	stack.push(v);
 }
 
-void Truba_CS::topologicalSort(vector<Truba_CS>& graph) {
+void Truba_CS::topologicalSort(vector<Truba_CS>& graph, unordered_map <int, CS>& s) {
 	if (graph.size() == 0) {
 		cout << "You do not have graph!!!!" << endl;
 		return;
 	}
-	set<int>vertex;
+	set<int>vertexes;
 	for (auto& edge : graph) {
-		vertex.insert(edge.id_entry);
-		vertex.insert(edge.id_outlet);
+		vertexes.insert(edge.id_entry);
+		vertexes.insert(edge.id_outlet);
 	}
-	int n = size(vertex);
+	int n = s.size();
 	vector<bool> visited(n, false);
 	stack<int> stack;
 
 	for (int v = 0; v < n; v++) {
-		if (!visited[v])
-			topologicalSortUtil(v, graph, visited, stack);
+		if (find(vertexes.begin(), vertexes.end(), v) != vertexes.end()){
+			if (!visited[v])
+				topologicalSortUtil(v, graph, visited, stack, vertexes);
+		}
+		
 	}
 
 	vector<int> result;
@@ -894,9 +831,201 @@ void Truba_CS::topologicalSort(vector<Truba_CS>& graph) {
 			cout << v << " ";
 		}
 		cout << endl;
-	}
-
-	
+	}	
 }
 
+void Truba_CS::dekstra(unordered_map<int, Truba>& pipe, vector<Truba_CS>& graph, unordered_map<int, CS>& ks)
+{
+	if (graph.size() == 0)
+	{
+		cout << "You have no connections." << endl;
+		return;
+	}
 
+	set<int>vertexes;
+	int maxil = 0;
+	int minil = 0;
+	for (auto& edge : graph)
+	{
+		vertexes.insert(edge.id_entry);
+		vertexes.insert(edge.id_outlet);
+		if (maxil < max(edge.id_entry, edge.id_outlet))
+		{
+			maxil = max(edge.id_entry, edge.id_outlet);
+		}
+		if (minil > min(edge.id_entry, edge.id_outlet)) {
+			minil = min(edge.id_entry, edge.id_outlet);
+		}
+	}
+
+	int start_vertex;
+	int end_vertex;
+
+	cout << "Enter CS from which you want to find the shortest path: ";
+	//cin >> start_vertex;
+	start_vertex = GetCorrect( minil, maxil);
+	if (find(vertexes.begin(), vertexes.end(), start_vertex) == vertexes.end())
+	{
+		while (true)
+		{
+			cout << "There is no such ID, please enter it again: ";
+			start_vertex = GetCorrect(minil, maxil);
+			if (find(vertexes.begin(), vertexes.end(), start_vertex) != vertexes.end())
+			{
+				break;
+			}
+		}
+	}
+	cout << "Enter the cs you want to find the shortest path to: ";
+	end_vertex = GetCorrect(minil, maxil);
+	if (find(vertexes.begin(), vertexes.end(), end_vertex) == vertexes.end())
+	{
+		while (true)
+		{
+			cout << "There is no such ID, please enter it again: ";
+			end_vertex = GetCorrect(minil, maxil);
+			if (find(vertexes.begin(), vertexes.end(), start_vertex) != vertexes.end())
+			{
+				break;
+			}
+		}
+	}
+
+	for (const auto& vertex : vertexes) {
+		ks[vertex].shortest_path = numeric_limits<int>::max();
+	}
+
+	ks[start_vertex].shortest_path = 0;
+
+	priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;
+	pq.push({ 0, start_vertex });
+
+	while (!pq.empty()) {
+		int current_vertex = pq.top().second;
+		int current_distance = pq.top().first;
+		pq.pop();
+
+		if (current_vertex == end_vertex) {
+			break;
+		}
+		for (const auto& edge : graph) {
+			if (edge.id_entry == current_vertex) {
+				int neighbor_vertex = edge.id_outlet;
+				const Truba& truba = pipe[edge.id_pipe];
+				double new_distance = current_distance + truba.lenght;
+				if (new_distance < ks[neighbor_vertex].shortest_path) {
+					ks[neighbor_vertex].shortest_path = new_distance;
+					pq.push({ new_distance, neighbor_vertex });
+				}
+			}
+		}
+	}
+	if (ks[end_vertex].shortest_path == numeric_limits<int>::max()) {
+		cout << "You do not have path!!!!!" << endl;
+	}
+	else
+		cout << "Shortest path from " << start_vertex << " to " << end_vertex << ": " << ks[end_vertex].shortest_path << endl;
+}
+
+bool bfs(vector<vector<int>>& rGraph, int s, int t, vector<int>& parent)
+{
+	int V = rGraph.size();
+	vector<bool> visited(V, false);
+
+	queue<int> q;
+	q.push(s);
+	visited[s] = true;
+	parent[s] = -1;
+
+	while (!q.empty())
+	{
+		int u = q.front();
+		q.pop();
+
+		for (int v = 0; v < V; v++)
+		{
+			if (visited[v] == false && rGraph[u][v] > 0)
+			{
+				q.push(v);
+				parent[v] = u;
+				visited[v] = true;
+			}
+		}
+	}
+
+	return (visited[t] == true);
+}
+
+void Truba_CS::fordFulkerson(vector<Truba_CS>& graph, unordered_map<int, Truba>& pipe, unordered_map<int, CS>& ks)
+{
+	set<int>vertexes;
+	int maxil = 0;
+	int minil = 0;
+	for (auto& edge : graph)
+	{
+		vertexes.insert(edge.id_entry);
+		vertexes.insert(edge.id_outlet);
+		if (maxil < max(edge.id_entry, edge.id_outlet))
+		{
+			maxil = max(edge.id_entry, edge.id_outlet);
+		}
+		if (minil > min(edge.id_entry, edge.id_outlet)) {
+			minil = min(edge.id_entry, edge.id_outlet);
+		}
+	}
+	cout << "Enter the sourse" << endl;
+	int s = GetCorrect(minil, maxil);
+	cout << "Enter the sink" << endl;
+	int t = GetCorrect(minil, maxil);
+	if (s==t)
+	{
+		while (true)
+		{
+			cout << "There is no such ID, please enter it again: ";
+			int t = GetCorrect(minil, maxil);
+			if (s!=t)
+			{
+				break;
+			}
+		}
+	}
+
+	int V = ks.size();
+	vector<vector<int>> Rgraph(V, vector<int>(V, 0));
+	for (const Truba_CS& edge : graph) {
+		Rgraph[edge.id_entry][edge.id_outlet] = pipe[edge.id_pipe].lenght;
+	}
+
+	vector<vector<int>> rGraph(V, vector<int>(V, 0));
+	for (int u = 0; u < V; u++)
+	{
+		for (int v = 0; v < V; v++)
+		{
+			rGraph[u][v] = Rgraph[u][v];
+		}
+	}
+
+	vector<int> parent(V, -1);
+	int maxFlow = 0;
+
+	while (bfs(rGraph, s, t, parent))
+	{
+		int pathFlow = INT_MAX;
+		for (int v = t; v != s; v = parent[v])
+		{
+			int u = parent[v];
+			pathFlow = min(pathFlow, rGraph[u][v]);
+		}
+
+		for (int v = t; v != s; v = parent[v])
+		{
+			int u = parent[v];
+			rGraph[u][v] -= pathFlow;
+			rGraph[v][u] += pathFlow;
+		}
+
+		maxFlow += pathFlow;
+	}
+	cout << "Max flow: " << maxFlow << endl;
+	
+}
